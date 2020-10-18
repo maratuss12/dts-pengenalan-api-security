@@ -1,32 +1,26 @@
 import express from 'express';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
-import router from './router.js';
+import userRouter from './controllers/UserController.js';
+import router from './controllers/kasirController.js';
+
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 
-mongoose.connect('mongodb+srv://admin:admin@digitalent.hpf1j.mongodb.net/jadwalin?retryWrites=true&w=majority',
+//connect to db with dotenv
+const uri = process.env.MONGODB_URI;
+mongoose.connect(uri,
 {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(()=> {
-    console.log('Connect to db success say')
+    console.log('Connect to db success')
 }).catch(err => {
-    console.log('Connect to db failed bos!!!');
+    console.log('Connect to db failed!!!');
     console.log(err)
 })
-
-// connectDB();
-
-//connect to db tanpa pengecekan credential
-// mongoose.connect('mongodb+srv://admin:admin@digitalent.hpf1j.mongodb.net/jadwalin?retryWrites=true&w=majority',
-// {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-// }, 
-// () => {
-//     console.log('Connect to db success');
-// });
 
 //middleware
 app.use(morgan('dev'));
@@ -40,8 +34,10 @@ app.get('/', (req, res) => {
 })
 
 //untuk memanggil router.js
+app.use('/api/user', userRouter);
 app.use('/api', router);
 
-app.listen('3000', () => {
-    console.log('App listens on port 3000')
+const port = process.env.PORT || 8000;
+app.listen(port, () => {
+    console.log(`App listens on port ${port}`)
 });
